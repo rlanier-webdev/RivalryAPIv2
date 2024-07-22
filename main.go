@@ -58,6 +58,8 @@ func main() {
 	r.GET("/api/games", getGamesHandler)
 	r.GET("/api/games/:id", getGameByIDHandler)
 	r.GET("/api/games/year/:year", getGamesByYearHandler)
+	r.GET("/api/games/home/:team", getGamesByHomeHandler)
+	r.GET("/api/games/away/:team", getGamesByAwayHandler)
 
 	if err := r.Run(":1889"); err != nil {
 		log.Fatal("Failed to run server: ", err)

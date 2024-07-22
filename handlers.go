@@ -63,4 +63,48 @@ func getGamesByYearHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, games)
 }
 
+func getGamesByHomeHandler(c *gin.Context) {
+	homeTeam := c.Param("team")
+
+	if homeTeam == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Team name cannot be empty"})
+		return
+	}
+
+	var games []model.Game
+	if err := db.Where("home_team = ?", homeTeam).Find(&games).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrive games: " + err.Error()})
+		return
+	}
+
+	if len(games) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "No games found for the given team"})
+		return
+	}
+
+	c.JSON(http.StatusOK, games)
+}
+
+func getGamesByAwayHandler(c *gin.Context) {
+	homeTeam := c.Param("team")
+
+	if homeTeam == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Team name cannot be empty"})
+		return
+	}
+
+	var games []model.Game
+	if err := db.Where("away_team = ?", homeTeam).Find(&games).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrive games: " + err.Error()})
+		return
+	}
+
+	if len(games) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "No games found for the given team"})
+		return
+	}
+
+	c.JSON(http.StatusOK, games)
+}
+
 // End game handlers
