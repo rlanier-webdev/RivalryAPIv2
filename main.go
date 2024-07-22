@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/rlanier-webdev/RivalryAPIv2/frontend"
-	"github.com/rlanier-webdev/RivalryAPIv2/models"
+	"github.com/rlanier-webdev/RivalryAPIv2/model"
 	"gorm.io/gorm"
 )
 
@@ -24,15 +24,26 @@ func initDB() {
 			log.Fatal("failed to connect to database: ", err)
 		}
 
-		err = db.AutoMigrate(&models.Game{})
+		err = db.AutoMigrate(&model.Game{})
 		if err != nil {
 			log.Fatal("failed to migrate database: ", err)
 		}
+
+		// Load games from the database
+		var games []model.Game
+		err = db.Find(&games).Error
+		if err != nil {
+			log.Fatal("failed to load games from the database: ", err)
+		}
+
+		// Set the loaded games in the frontend package
+		frontend.SetGames(games)
 	})
 }
 
 func main() {
 	initDB()
+	frontend.SetDB(db)
 
 	r := gin.Default()
 

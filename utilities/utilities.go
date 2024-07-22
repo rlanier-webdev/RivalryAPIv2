@@ -1,50 +1,57 @@
+// utilities/customdate.go
 package utilities
 
 import (
-	"database/sql/driver"
-	"fmt"
-	"time"
+    "database/sql/driver"
+    "fmt"
+    "time"
 )
 
-type CustomDate time.Time
+type CustomDate struct {
+    time.Time
+}
 
-const customDateFormat = "2006-01-02"
-
-// UnmarshalJSON parses a date string in the custom format.
 func (cd *CustomDate) UnmarshalJSON(b []byte) error {
-	str := string(b)
-	str = str[1:len(str)-1] // Trim the quotes
-	t, err := time.Parse(customDateFormat, str)
-	if err != nil {
-		return fmt.Errorf("invalid date format: %w", err)
-	}
-	*cd = CustomDate(t)
-	return nil
+    t, err := time.Parse(`"2006-01-02"`, string(b))
+    if err != nil {
+        return err
+    }
+    cd.Time = t
+    return nil
 }
 
-// MarshalJSON formats a CustomDate as a JSON string.
 func (cd CustomDate) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%s\"", time.Time(cd).Format(customDateFormat))), nil
+    return []byte(fmt.Sprintf(`"%s"`, cd.Time.Format("2006-01-02"))), nil
 }
 
-// Scan implements the sql.Scanner interface.
-func (cd *CustomDate) Scan(value interface{}) error {
-	switch v := value.(type) {
-	case time.Time:
-		*cd = CustomDate(v)
-	case string:
-		t, err := time.Parse(customDateFormat, v)
-		if err != nil {
-			return fmt.Errorf("invalid date format: %w", err)
-		}
-		*cd = CustomDate(t)
-	default:
-		return fmt.Errorf("unsupported type: %T", v)
-	}
-	return nil
+func (cd CustomDate) String() string {
+    return cd.Time.Format("2006-01-02")
 }
 
-// Value implements the driver.Valuer interface.
+// Implement the Valuer interface
 func (cd CustomDate) Value() (driver.Value, error) {
-	return time.Time(cd).Format(customDateFormat), nil
+    return cd.Time, nil
+}
+
+// Implement the Scanner interface
+func (cd *CustomDate) Scan(value interface{}) error {
+    if value == nil {
+        *cd = CustomDate{Time: time.Time{}}
+        return nil
+    }
+
+    switch v := value.(type) {
+    case time.Time:
+        *cd = CustomDate{Time: v}
+        return nil
+    case string:
+        t, err := time.Parse("2006-01-02", v)
+        if err != nil {
+            return err
+        }
+        *cd = CustomDate{Time: t}
+        return nil
+    default:
+        return fmt.Errorf("cannot scan type %T into CustomDate: %v", value, value)
+    }
 }
