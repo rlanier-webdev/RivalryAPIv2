@@ -5,6 +5,7 @@ go 1.22.4
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/glebarez/sqlite v1.11.0
+	github.com/russross/blackfriday v1.6.0
 	gorm.io/gorm v1.25.11
 )
 

@@ -9,37 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Team Handlers
-func createTeamHandler(c *gin.Context) {
-	var team Team
-
-	// Parse the Incoming Request
-	if err := c.ShouldBindJSON(&team); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
-		return
-	}
-
-	// Create the Team
-	if err := db.Create(&team).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create team"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, team)
-}
-
-func getTeamsHandler(c *gin.Context) {
-	var teams []Team
-	if err := db.Find(&teams).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(200, teams)
-}
-
-// End Team Handlers
-
 // Game Handlers
 func getGamesHandler(c *gin.Context) {
 	var games []Game

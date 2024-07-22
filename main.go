@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
+	"github.com/rlanier-webdev/RivalryAPIv2/frontend"
 	"gorm.io/gorm"
 )
 
@@ -14,11 +15,6 @@ var (
 	err  error
 	once sync.Once
 )
-
-type Team struct {
-	gorm.Model
-	Name string `json:"name" binding:"required" gorm:"unique;not null"`
-}
 
 type Game struct {
 	ID            uint `gorm:"primaryKey"`
@@ -37,7 +33,7 @@ func initDB() {
 			log.Fatal("failed to connect to database: ", err)
 		}
 
-		err = db.AutoMigrate(&Team{}, &Game{})
+		err = db.AutoMigrate(&Game{})
 		if err != nil {
 			log.Fatal("failed to migrate database: ", err)
 		}
@@ -49,8 +45,12 @@ func main() {
 
 	r := gin.Default()
 
-	r.POST("/api/teams", createTeamHandler)
-	r.GET("/api/teams", getTeamsHandler)
+	r.Static("/static", "./static")
+	r.LoadHTMLGlob("templates/*")
+
+	r.GET("/", frontend.IndexPageHandler)
+	r.GET("/search", frontend.SearchPageHandler)
+	r.GET("/docs", frontend.DocumentationPageHandler)
 
 	r.GET("/api/games", getGamesHandler)
 	r.GET("/api/games/:id", getGameByIDHandler)
