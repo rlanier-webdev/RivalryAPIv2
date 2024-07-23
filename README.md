@@ -7,7 +7,7 @@ This API provides endpoints to retrieve information about the historic City-Poly
 ## Endpoints
 ------------
 ### Get All Games
-- **URL**: `/api/games/all`
+- **URL**: `/api/games`
 - **Method**: `GET`
 - **Description**: Returns all games in JSON format.
 - **Response**: 
