@@ -6,14 +6,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rlanier-webdev/RivalryAPIv2/model"
+	"github.com/rlanier-webdev/RivalryAPIv2/models"
 
 	"gorm.io/gorm"
 )
 
 // Game Handlers
 func getGamesHandler(c *gin.Context) {
-	var games []model.Game
+	var games []models.Game
 	if err := db.Find(&games).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -30,7 +30,7 @@ func getGameByIDHandler(c *gin.Context) {
 		return
 	}
 
-	var game model.Game
+	var game models.Game
 	if err := db.First(&game, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Game not found"})
@@ -54,7 +54,7 @@ func getGamesByYearHandler(c *gin.Context) {
 	startDate := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(year+1, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-	var games []model.Game
+	var games []models.Game
 	if err := db.Where("date >= ? AND date < ?", startDate, endDate).Find(&games).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -71,7 +71,7 @@ func getGamesByHomeHandler(c *gin.Context) {
 		return
 	}
 
-	var games []model.Game
+	var games []models.Game
 	if err := db.Where("home_team = ?", homeTeam).Find(&games).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrive games: " + err.Error()})
 		return
@@ -93,7 +93,7 @@ func getGamesByAwayHandler(c *gin.Context) {
 		return
 	}
 
-	var games []model.Game
+	var games []models.Game
 	if err := db.Where("away_team = ?", homeTeam).Find(&games).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrive games: " + err.Error()})
 		return

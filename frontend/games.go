@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rlanier-webdev/RivalryAPIv2/model"
+	"github.com/rlanier-webdev/RivalryAPIv2/models"
 )
 
 func GamesPageHandler(c *gin.Context) {
-	var games []model.Game
+	var games []models.Game
 	if err := db.Find(&games).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "games.html", gin.H{
 			"Title":   "All Games",

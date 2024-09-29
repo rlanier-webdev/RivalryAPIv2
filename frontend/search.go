@@ -6,13 +6,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rlanier-webdev/RivalryAPIv2/model"
+	"github.com/rlanier-webdev/RivalryAPIv2/models"
 )
 
 func SearchPageHandler(c *gin.Context) {
 	searchType := c.Query("searchType")
 	query := c.Query("query")
-	var results []model.Game
+	var results []models.Game
 	var message string
 
 	switch searchType {
