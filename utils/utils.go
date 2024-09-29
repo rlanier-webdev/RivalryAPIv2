@@ -1,5 +1,5 @@
 // utilities/customdate.go
-package utilities
+package utils
 
 import (
     "database/sql/driver"
