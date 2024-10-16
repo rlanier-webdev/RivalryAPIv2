@@ -1,4 +1,4 @@
-// utilities/customdate.go
+// utils/customdate.go
 package utils
 
 import (
