@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
+	"github.com/joho/godotenv"
 	"github.com/rlanier-webdev/RivalryAPIv2/frontend"
 	"github.com/rlanier-webdev/RivalryAPIv2/models"
 	"gorm.io/gorm"
@@ -16,6 +19,13 @@ var (
 	err  error
 	once sync.Once
 )
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+}
 
 func initDB() {
 	once.Do(func() {
@@ -45,6 +55,8 @@ func main() {
 	initDB()
 	frontend.SetDB(db)
 
+	// Release mode
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	r.Static("/static", "./static")
@@ -61,7 +73,12 @@ func main() {
 	r.GET("/api/games/home/:team", getGamesByHomeHandler)
 	r.GET("/api/games/away/:team", getGamesByAwayHandler)
 
-	if err := r.Run(":1889"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal("Failed to run server: ", err)
 	}
 }
