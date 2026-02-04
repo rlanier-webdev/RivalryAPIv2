@@ -3,22 +3,51 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/joho/godotenv"
 	"github.com/rlanier-webdev/RivalryAPIv2/frontend"
 	"github.com/rlanier-webdev/RivalryAPIv2/models"
+	"golang.org/x/time/rate"
 	"gorm.io/gorm"
 )
 
 var (
-	db   *gorm.DB
-	err  error
-	once sync.Once
+	db       *gorm.DB
+	err      error
+	once     sync.Once
+	limiters = make(map[string]*rate.Limiter)
+	limiterMu sync.Mutex
 )
+
+// rateLimitMiddleware limits requests per IP address
+func rateLimitMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ip := c.ClientIP()
+
+		limiterMu.Lock()
+		limiter, exists := limiters[ip]
+		if !exists {
+			// Allow 10 requests per second with burst of 20
+			limiter = rate.NewLimiter(10, 20)
+			limiters[ip] = limiter
+		}
+		limiterMu.Unlock()
+
+		if !limiter.Allow() {
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+				"error": "Too many requests. Please slow down.",
+			})
+			return
+		}
+		c.Next()
+	}
+}
 
 func init() {
 	err := godotenv.Load()
@@ -58,6 +87,21 @@ func main() {
 	// Release mode
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
+
+	// Trust Railway's proxy headers
+	r.SetTrustedProxies([]string{"127.0.0.1"})
+
+	// CORS configuration for API access
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowCredentials: false,
+		MaxAge:           86400,
+	}))
+
+	// Rate limiting (10 req/s per IP, burst of 20)
+	r.Use(rateLimitMiddleware())
 
 	r.Static("/static", "./static")
 	r.LoadHTMLGlob("templates/*")

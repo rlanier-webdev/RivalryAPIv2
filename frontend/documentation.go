@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
 )
 
@@ -15,10 +16,15 @@ func DocumentationPageHandler(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Failed to read documentation")
 		return
 	}
-	htmlContent := blackfriday.MarkdownCommon(mdContent)
+
+	// Convert markdown to HTML
+	unsafeHTML := blackfriday.MarkdownCommon(mdContent)
+
+	// Sanitize HTML to prevent XSS
+	policy := bluemonday.UGCPolicy()
+	safeHTML := policy.SanitizeBytes(unsafeHTML)
 
 	c.HTML(http.StatusOK, "documentation.html", gin.H{
-		"Content": template.HTML(htmlContent),
+		"Content": template.HTML(safeHTML),
 	})
-
 }
