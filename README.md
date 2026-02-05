@@ -4,6 +4,10 @@
 ------------
 This API provides endpoints to retrieve information about the historic City-Poly game.
 
+## Try it in Postman
+------------
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/thrtn85/main/api/2451bd7d-f19d-4b66-9317-a605ced2ba0c/entity?action=share&creator=13028315)
+
 ## Endpoints
 ------------
 ### Get All Games
