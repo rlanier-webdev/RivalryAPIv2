@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -50,10 +49,8 @@ func rateLimitMiddleware() gin.HandlerFunc {
 }
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-	}
+	// Load .env file if present (local dev only, ignored in production)
+	_ = godotenv.Load()
 }
 
 func initDB() {
