@@ -108,3 +108,36 @@ func getGamesByAwayHandler(c *gin.Context) {
 }
 
 // End game handlers
+
+// Team Handlers
+func getTeamsHandler(c *gin.Context) {
+	var homeTeams, awayTeams []string
+
+	if err := db.Model(&models.Game{}).Distinct().Pluck("home_team", &homeTeams).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := db.Model(&models.Game{}).Distinct().Pluck("away_team", &awayTeams).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Combine and deduplicate
+	teamSet := make(map[string]bool)
+	for _, t := range homeTeams {
+		teamSet[t] = true
+	}
+	for _, t := range awayTeams {
+		teamSet[t] = true
+	}
+
+	teams := make([]string, 0, len(teamSet))
+	for t := range teamSet {
+		teams = append(teams, t)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"teams": teams})
+}
+
+// End team handlers

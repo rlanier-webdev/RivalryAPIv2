@@ -66,6 +66,14 @@ This API provides endpoints to retrieve information about the historic City-Poly
     - `404 Not Found` if no games are found for the specified year.
   - Body: JSON array of games played in the specified year.
 
+### Get All Teams
+- **URL**: `/api/teams`
+- **Method**: `GET`
+- **Description**: Returns all unique team names.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: JSON object with teams array.
+
 ## Data Structure
 ------------
 ### Game

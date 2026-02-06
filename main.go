@@ -114,6 +114,8 @@ func main() {
 	r.GET("/api/games/home/:team", getGamesByHomeHandler)
 	r.GET("/api/games/away/:team", getGamesByAwayHandler)
 
+	r.GET("/api/teams", getTeamsHandler)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
