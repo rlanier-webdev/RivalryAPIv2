@@ -10,6 +10,17 @@ import (
 
 	"gorm.io/gorm"
 )
+func getMainHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "healthy",
+		"version": "1.0.0",
+		"endpoints": gin.H{
+			"games": "/api/games",
+			"teams": "/api/teams",
+			"docs":  "/docs",
+		},
+	})
+}
 
 // Game Handlers
 func getGamesHandler(c *gin.Context) {

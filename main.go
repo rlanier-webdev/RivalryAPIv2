@@ -108,6 +108,7 @@ func main() {
 	r.GET("/docs", frontend.DocumentationPageHandler)
 	r.GET("/games", frontend.GamesPageHandler)
 
+	r.GET("/api", getMainHandler)
 	r.GET("/api/games", getGamesHandler)
 	r.GET("/api/games/:id", getGameByIDHandler)
 	r.GET("/api/games/year/:year", getGamesByYearHandler)
